@@ -173,6 +173,31 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>, P
             this.value = value;
             return this;
         }
+
+        public Double getMin() {
+            return min;
+        }
+
+        public Double getMax() {
+            return max;
+        }
+
+        public Double getStep() {
+            return step;
+        }
+
+        public Integer getPage() {
+            return page;
+        }
+
+        public Integer getDecimals() {
+            return decimals;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
     }
 
     @Override

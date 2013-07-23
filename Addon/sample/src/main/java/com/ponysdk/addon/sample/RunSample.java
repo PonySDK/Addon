@@ -22,8 +22,9 @@ public class RunSample {
 
             final BootstrapServlet bootstrapServlet = new BootstrapServlet();
             bootstrapServlet.addStylesheet("css/sample.less");
-            bootstrapServlet.addStylesheet("css/ponysdk.less");
             bootstrapServlet.addJavascript("spinner/spinner.nocache.js");
+            bootstrapServlet.addJavascript("https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false");
+            bootstrapServlet.addJavascript("script/maps-addon.js");
             bootstrapServlet.addJavascript("script/less.js");
 
             final Main main = new Main();

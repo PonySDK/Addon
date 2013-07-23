@@ -1,5 +1,5 @@
 
 dependencies {
-	compile project(':spinner')
-	runtime project(':spinner')
+	compile project(':spinner'), project(':maps')
+	runtime project(':spinner'), project(':maps')
 }
