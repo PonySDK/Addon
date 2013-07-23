@@ -2,7 +2,6 @@
 package com.ponysdk.addon.sample.client;
 
 import com.ponysdk.addon.spinner.server.PSpinner;
-import com.ponysdk.addon.spinner.server.PSpinner.Options;
 import com.ponysdk.ui.server.basic.IsPWidget;
 import com.ponysdk.ui.server.basic.PButton;
 import com.ponysdk.ui.server.basic.PFlexTable;
@@ -31,7 +30,7 @@ public class NumberTextBoxPage implements IsPWidget, PValueChangeHandler<String>
 
                 for (int i = 0; i < 20; i++) {
                     for (int j = 0; j < 8; j++) {
-                        final Options options = new PSpinner.Options().withMin(1d).withMax(10000d).withPage(10).withStep(0.01d).withNumberFormat(2);
+                        final PSpinner.Options options = new PSpinner.Options().withMin(1d).withMax(10000d).withPage(10).withStep(0.01d).withNumberFormat(2);
                         final PSpinner spinner = new PSpinner(options);
                         spinner.addValueChangeHandler(NumberTextBoxPage.this);
                         table.setWidget(i, j, spinner);

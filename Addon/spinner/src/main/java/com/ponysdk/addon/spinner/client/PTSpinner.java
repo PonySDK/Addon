@@ -131,7 +131,7 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         wrapper.add(textBox);
         wrapper.add(up);
         wrapper.add(down);
-        wrapper.setStyleName("spinner");
+        wrapper.setStyleName("spinner-addon");
 
         up.setStyleName("up");
         down.setStyleName("down");

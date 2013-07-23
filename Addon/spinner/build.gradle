@@ -1,44 +1,41 @@
 
 project.ext {
 	version = 1.0
-	gwtsrc = "spinner/src/main/java"
+	gwtterminalsrc = "src/main/java/com/ponysdk/addon/spinner/client"
 	gwtmodule = "com.ponysdk.addon.spinner.Spinner"
 }
 
 jar {
     from sourceSets.main.output
     from file(buildDir.name + '/gwt')
-    from sourceSets.main.resources
 }
 
-task deb << {
-	println(sourceSets.main.java.srcDirs);
-	println(sourceSets.main.output);
-	println(configurations.gwt);
-}
-
-task gwtc(type: JavaExec) {
+task gwtc {
 	description = 'GWT compile'
-	main = 'com.google.gwt.dev.Compiler'
-	maxHeapSize = '512M'
-	workingDir = buildDir
-	inputs.dir file(project.gwtsrc)
-	classpath {
-		[
-			sourceSets.main.java.srcDirs,
-			sourceSets.main.output,
-			configurations.gwt,
-			configurations.gwtexporter
-		]
-	}
-	args = [
-		'-war',
-		'gwt',
-		'-localWorkers',
-		Runtime.getRuntime().availableProcessors(),
-		project.gwtmodule
-	]
+	inputs.files fileTree(project.ext.gwtterminalsrc)
+    outputs.dir fileTree(buildDir.name+'/gwt')
+    doLast {
+    	javaexec {
+			main = 'com.google.gwt.dev.Compiler'
+			maxHeapSize = '512M'
+			workingDir = buildDir
+			classpath {
+				[
+					sourceSets.main.java.srcDirs,
+					sourceSets.main.output,
+					configurations.gwt,
+					configurations.gwtexporter
+				]
+			}
+			args = [
+				'-war',
+				'gwt',
+				'-localWorkers',
+				Runtime.getRuntime().availableProcessors(),
+				project.ext.gwtmodule
+			]
+    	}
+    }
 }
 
-gwtc.dependsOn(deb)
 jar.dependsOn(gwtc)

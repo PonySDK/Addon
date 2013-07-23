@@ -3,7 +3,6 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.6
 
-
 allprojects {
     group = 'com.ponysdk.addon'
     version = '1.0'
@@ -36,7 +35,7 @@ allprojects {
 		}
 
 		dependencies {
-			ponysdk ':ponysdk:1.4.7'
+			ponysdk ':ponysdk:1.4.9'
 			gwt 'com.google.gwt:gwt-user:2.5.1'
 			gwt 'com.google.gwt:gwt-dev:2.5.1'
 			gwt 'com.google.gwt:gwt-codeserver:2.5.1'
@@ -57,6 +56,7 @@ allprojects {
 		    jetty 'org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0'
 		}
 	}
+	
 }
 
 subprojects {
@@ -65,6 +65,53 @@ subprojects {
     task root << {
     	println "rootdir=$rootDir" 
 	}
+	
+	jar {
+	    manifest {
+		    def timestamp = (int)(new Date().getTime()/1000)
+			attributes("Manifest-Version": "1.0")
+			attributes("Created-By": "PonySDK")
+			attributes("Built-By": "PonySDK")
+			attributes("License-Title": "Apache License 2.0")
+			attributes("Specification-Title": "PonySDK")
+		    attributes("Specification-Version": version)
+		    attributes("Specification-Vendor": "PonySDK")
+		    attributes("Implementation-Title": "PonySDK-"+project.name)
+		    attributes("Implementation-Version": version)
+		    attributes("Implementation-Vendor-Id": "com.ponysdk.addon")
+			attributes("Implementation-Vendor": "PonySDK")
+		    attributes("Date": timestamp + " / " + new Date().toGMTString())
+		}
+	}
+	
+	task sourcesJar(type: Jar, dependsOn:classes) {
+	    classifier = 'sources'
+		from sourceSets.main.allJava
+		from sourceSets.test.allJava
+		from 'src/main/java'
+		
+	    manifest {
+		    def timestamp = (int)(new Date().getTime()/1000)
+			attributes("Manifest-Version": "1.0")
+			attributes("Created-By": "PonySDK")
+			attributes("Built-By": "PonySDK")
+			attributes("License-Title": "Apache License 2.0")
+			attributes("Specification-Title": "PonySDK")
+		    attributes("Specification-Version": version)
+		    attributes("Specification-Vendor": "PonySDK")
+		    attributes("Implementation-Title": "PonySDK"+project.name)
+		    attributes("Implementation-Version": version)
+		    attributes("Implementation-Vendor-Id": "com.ponysdk.addon")
+			attributes("Implementation-Vendor": "PonySDK")
+		    attributes("Classifier": "sources")
+		    attributes("Date": timestamp + " / " + new Date().toGMTString())
+		}
+	}
+	
+	artifacts {
+		archives sourcesJar
+	}
+	
 }
 
 task launcher() << {
@@ -88,6 +135,7 @@ task launcher() << {
 	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER&quot; javaProject=&quot;ponysdk-addon&quot; path=&quot;1&quot; type=&quot;4&quot;/&gt;&#13;&#10;\"/>\n")
 	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;ponysdk-addon&quot; type=&quot;1&quot;/&gt;&#13;&#10;\"/>\n")
 	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/ponysdk-addon/sample/src/main/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/ponysdk-addon/spinner/src/main/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
 	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/ponysdk-addon/spinner/build/gwt&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
 	for(file in configurations.runtime) {
 		writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;$file&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
