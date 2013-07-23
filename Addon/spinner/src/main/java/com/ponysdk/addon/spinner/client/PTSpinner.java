@@ -2,8 +2,6 @@
 package com.ponysdk.addon.spinner.client;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.Exportable;
@@ -29,34 +27,17 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.TextBox;
-
-//public class PTSpinner {
-//
-//    public PTSpinner(final String objectID, final Element uiObject) {
-//        final Label l1 = new Label("Spinner");
-//        final Label l2 = new Label("ObjectID: " + objectID);
-//
-//        uiObject.appendChild(l1.getElement());
-//        uiObject.appendChild(l2.getElement());
-//    }
-//
-//}
 
 @Export
 public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, KeyDownHandler, KeyUpHandler, com.google.gwt.event.logical.shared.ValueChangeHandler<String>, MouseOutHandler, ClickHandler {
 
-    // public native void exportUpdateFunction() /*-{
-    // var that = this;
-    // that.update = function(data) {
-    // $entry(that.@com.ponysdk.addon.spinner.client.PTSpinner::update(Lcom/google/gwt/core/client/JavaScriptObject;)(data));
-    // }
-    // }-*/;
-
     private static final String ZEROS = "0000000000000000";
 
-    private Element wrapper;
+    private MyComplexPanel wrapper;
     private final InlineHTML up = new InlineHTML("<span class=\"u\"></span>");
     private final InlineHTML down = new InlineHTML("<span class=\"d\"></span>");
     private final TextBox textBox = new TextBox();
@@ -82,8 +63,6 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     private BigDecimal max = new BigDecimal(0);
     private BigDecimal step = new BigDecimal(1);
     private BigDecimal pagedStep = new BigDecimal(10);
-
-    private final List<ValueChangeHandler> handlers = new ArrayList<ValueChangeHandler>();
 
     private RefreshCommand refreshCommand;
 
@@ -125,19 +104,34 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
 
     }
 
+    private class MyComplexPanel extends FlowPanel {
+
+        public MyComplexPanel(final Element element) {
+            setElement(element);
+        }
+
+        @Override
+        public void onAttach() {
+            super.onAttach();
+        }
+    }
+
     public PTSpinner() {}
 
     public void setObjectID(final String objectID) {
         this.objectID = objectID;
     }
 
+    // Export by gwt-exporter
     public void build(final Element uiObject) {
-        wrapper = uiObject;
 
-        wrapper.appendChild(textBox.getElement());
-        wrapper.appendChild(up.getElement());
-        wrapper.appendChild(down.getElement());
-        wrapper.setClassName("spinner");
+        wrapper = new MyComplexPanel(uiObject);
+        wrapper.onAttach();
+
+        wrapper.add(textBox);
+        wrapper.add(up);
+        wrapper.add(down);
+        wrapper.setStyleName("spinner");
 
         up.setStyleName("up");
         down.setStyleName("down");
@@ -162,16 +156,12 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         this.enabled = enabled;
         textBox.setEnabled(enabled);
         if (enabled) {
-            wrapper.addClassName("enabled");
-            wrapper.removeClassName("disabled");
+            wrapper.addStyleName("enabled");
+            wrapper.removeStyleName("disabled");
         } else {
-            wrapper.removeClassName("enabled");
-            wrapper.addClassName("disabled");
+            wrapper.removeStyleName("enabled");
+            wrapper.addStyleName("disabled");
         }
-    }
-
-    private void addValueChangeHandler(final ValueChangeHandler h) {
-        handlers.add(h);
     }
 
     private void decrease() {
@@ -223,7 +213,6 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     }
 
     public void update(final JavaScriptObject jso) {
-        log("updating with parameters: " + jso.toString());
         applyOptions(new JSONObject(jso));
     }
 
@@ -273,10 +262,6 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
                 }
             });
         }
-
-        log("min: " + min);
-        log("max: " + max);
-        log("step: " + step);
     }
 
     @Override
@@ -405,6 +390,7 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     @Override
     @NoExport
     public void onClick(final ClickEvent event) {
+
         if (enabled) {
 
             if (refreshCommand != null) {
@@ -431,13 +417,8 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         timerScheduled = false;
     }
 
-    private void fireIfNotEqual(final String prev, final String text) {
-        if (prev != text && (prev == null || !prev.equals(text))) {
-            fire();
-        }
-    }
-
     private void fire() {
+
         final String text = textBox.getText();
         if (text != null && !text.isEmpty()) {
             try {
@@ -450,9 +431,12 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         if (!valueChanged()) return;
         lastSendValue = value;
 
-        for (final ValueChangeHandler h : handlers) {
-            h.onValueChange(text);
-        }
+        // Send to server
+        final JSONObject data = new JSONObject();
+        if (value == null) data.put("value", new JSONString(""));
+        else data.put("value", new JSONString(value.toString()));
+
+        sendDataToServer(objectID, data.getJavaScriptObject());
     }
 
     private boolean valueChanged() {
@@ -462,10 +446,9 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         return false;
     }
 
-    private static interface ValueChangeHandler {
-
-        public void onValueChange(String v);
-    }
+    private native void sendDataToServer(final String objectID, final JavaScriptObject jsObject) /*-{
+                                                                                                 $wnd.sendDataToServer(objectID, jsObject);
+                                                                                                 }-*/;
 
     private native void log(String msg) /*-{
                                               console.log(msg);
