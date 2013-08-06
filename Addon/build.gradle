@@ -35,7 +35,7 @@ allprojects {
 		}
 
 		dependencies {
-			ponysdk ':ponysdk:1.4.9'
+			ponysdk ':ponysdk:1.11'
 			gwt 'com.google.gwt:gwt-user:2.5.1'
 			gwt 'com.google.gwt:gwt-dev:2.5.1'
 			gwt 'com.google.gwt:gwt-codeserver:2.5.1'
