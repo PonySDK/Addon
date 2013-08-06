@@ -1,0 +1,154 @@
+allprojects {
+    group = 'com.ponysdk.addon'
+    version = '1.0'
+	
+	repositories {
+		flatDir {
+	        dirs "$rootDir/lib"
+	    }
+		mavenCentral()
+	    maven {
+	        url "https://github.com/PonySDK/Maven/raw/master/ext"
+	        url "http://oss.sonatype.org/content/repositories/snapshots"
+	    }
+	}
+	
+	configurations {
+		gwt
+		json
+		logback
+		sl4j
+	    jetty
+	    ponysdk
+	    gwtexporter
+	    
+	   	compile {
+			extendsFrom gwt, sl4j, ponysdk, gwtexporter
+		}
+	
+		runtime {
+			extendsFrom sl4j, logback, jetty, ponysdk, json
+		}
+
+		dependencies {
+			ponysdk ':ponysdk:1.11'
+			gwt 'com.google.gwt:gwt-user:2.5.1'
+			gwt 'com.google.gwt:gwt-dev:2.5.1'
+			gwt 'com.google.gwt:gwt-codeserver:2.5.1'
+			gwt 'javax.validation:validation-api:1.0.0.GA@jar'
+			json 'org.json:json:20090211'
+			gwtexporter 'org.timepedia.exporter:gwtexporter:2.5.0-SNAPSHOT'
+			sl4j 'org.slf4j:slf4j-api:1.6.2'
+			sl4j 'org.slf4j:log4j-over-slf4j:1.6.4'
+			sl4j 'ch.qos.logback:logback-classic:1.0.0'
+			sl4j 'org.slf4j:jcl-over-slf4j:1.6.4'
+			logback 'ch.qos.logback:logback-core:1.0.13'
+			logback 'ch.qos.logback:logback-classic:1.0.13'
+		    jetty 'org.eclipse.jetty:jetty-server:8.1.4.v20120524'
+		    jetty 'org.eclipse.jetty:jetty-servlet:8.1.4.v20120524'
+		    jetty 'org.eclipse.jetty:jetty-webapp:8.1.4.v20120524'
+		    jetty 'org.eclipse.jetty:jetty-servlets:8.1.4.v20120524'
+		    jetty 'org.eclipse.jetty:jetty-websocket:8.1.4.v20120524'
+		    jetty 'org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0'
+		}
+	}
+	
+}
+
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+    
+    task root << {
+    	println "rootdir=$rootDir" 
+	}
+	
+	jar {
+	    manifest {
+		    def timestamp = (int)(new Date().getTime()/1000)
+			attributes("Manifest-Version": "1.0")
+			attributes("Created-By": "PonySDK")
+			attributes("Built-By": "PonySDK")
+			attributes("License-Title": "Apache License 2.0")
+			attributes("Specification-Title": "PonySDK")
+		    attributes("Specification-Version": version)
+		    attributes("Specification-Vendor": "PonySDK")
+		    attributes("Implementation-Title": "PonySDK-"+project.name)
+		    attributes("Implementation-Version": version)
+		    attributes("Implementation-Vendor-Id": "com.ponysdk.addon")
+			attributes("Implementation-Vendor": "PonySDK")
+		    attributes("Date": timestamp + " / " + new Date().toGMTString())
+		}
+	}
+	
+	task sourcesJar(type: Jar, dependsOn:classes) {
+	    classifier = 'sources'
+		from sourceSets.main.allJava
+		from sourceSets.test.allJava
+		from 'src/main/java'
+		
+	    manifest {
+		    def timestamp = (int)(new Date().getTime()/1000)
+			attributes("Manifest-Version": "1.0")
+			attributes("Created-By": "PonySDK")
+			attributes("Built-By": "PonySDK")
+			attributes("License-Title": "Apache License 2.0")
+			attributes("Specification-Title": "PonySDK")
+		    attributes("Specification-Version": version)
+		    attributes("Specification-Vendor": "PonySDK")
+		    attributes("Implementation-Title": "PonySDK"+project.name)
+		    attributes("Implementation-Version": version)
+		    attributes("Implementation-Vendor-Id": "com.ponysdk.addon")
+			attributes("Implementation-Vendor": "PonySDK")
+		    attributes("Classifier": "sources")
+		    attributes("Date": timestamp + " / " + new Date().toGMTString())
+		}
+	}
+	
+	artifacts {
+		archives sourcesJar
+	}
+	
+}
+
+task launcher() << {
+	File f = new File('build/launcher/AddOnSample.launch')
+	f.mkdirs()
+	f.delete()
+	
+	Writer writer = f.newWriter("UTF-8", true)
+	writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n")
+	writer.write("<launchConfiguration type=\"org.eclipse.jdt.launching.localJavaApplication\">\n")
+	writer.write("<listAttribute key=\"org.eclipse.debug.core.MAPPED_RESOURCE_PATHS\">\n")
+	writer.write("<listEntry value=\"/"+project(':sample').name+"/src/main/java/com/ponysdk/addon/sample/RunSample.java\"/>\n")
+	writer.write("</listAttribute>\n")
+	writer.write("<listAttribute key=\"org.eclipse.debug.core.MAPPED_RESOURCE_TYPES\">\n")
+	writer.write("<listEntry value=\"1\"/>\n")
+	writer.write("</listAttribute>\n")
+	writer.write("<booleanAttribute key=\"org.eclipse.debug.core.appendEnvironmentVariables\" value=\"true\"/>\n")
+	writer.write("<stringAttribute key=\"org.eclipse.debug.core.source_locator_id\" value=\"org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector\"/>\n")
+	writer.write("<stringAttribute key=\"org.eclipse.debug.core.source_locator_memento\" value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;sourceLookupDirector&gt;&#13;&#10;&lt;sourceContainers duplicates=&quot;false&quot;/&gt;&#13;&#10;&lt;/sourceLookupDirector&gt;&#13;&#10;\"/>\n")
+	writer.write("<listAttribute key=\"org.eclipse.jdt.launching.CLASSPATH\">\n")
+	
+	
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER&quot; javaProject=&quot;addon-spinner&quot; path=&quot;1&quot; type=&quot;4&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;addon-maps&quot; type=&quot;1&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;addon-sample&quot; type=&quot;1&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;addon-spinner&quot; type=&quot;1&quot;/&gt;&#13;&#10;\"/>\n")
+	
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/addon-sample/src/main/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/addon-spinner/src/main/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/addon-spinner/build/gwt&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/addon-maps/src/main/resources&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	for(file in configurations.runtime) {
+		writer.write("<listEntry value=\"&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;$file&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;\"/>\n")
+	}
+	writer.write("</listAttribute>\n")
+	writer.write("<booleanAttribute key=\"org.eclipse.jdt.launching.DEFAULT_CLASSPATH\" value=\"false\"/>\n")
+	writer.write("<stringAttribute key=\"org.eclipse.jdt.launching.MAIN_TYPE\" value=\"com.ponysdk.addon.sample.RunSample\"/>\n")
+	writer.write("<stringAttribute key=\"org.eclipse.jdt.launching.PROJECT_ATTR\" value=\"addon-sample\"/>\n")
+	writer.write("<stringAttribute key=\"org.eclipse.jdt.launching.VM_ARGUMENTS\" value=\"-server\"/>\n")
+	writer.write("</launchConfiguration>\n")
+	writer.close()
+}
+

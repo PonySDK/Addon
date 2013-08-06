@@ -1,0 +1,10 @@
+eclipse {
+	project {
+		name = 'addon-sample'
+	}
+}
+
+dependencies {
+	compile project(':spinner'), project(':maps')
+	runtime project(':spinner'), project(':maps')
+}

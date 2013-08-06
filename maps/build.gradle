@@ -1,0 +1,13 @@
+eclipse {
+	project {
+		name = 'addon-maps'
+	}
+}
+
+project.ext {
+	version = 1.0
+}
+
+jar {
+    from sourceSets.main.output
+}

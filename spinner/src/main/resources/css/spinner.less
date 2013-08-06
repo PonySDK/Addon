@@ -1,0 +1,111 @@
+
+// Variables
+// -------------------------
+
+@gray:				#555;
+@grayLight:			#999;
+@grayLighter:		#eee;
+
+// Mixins
+// -------------------------
+
+.border-radius (@size){
+	border-radius: @size;
+	-moz-border-radius: @size;
+	-khtml-border-radius: @size;
+	-webkit-border-radius: @size;
+}
+
+.box-sizing(@sizing) {
+	-moz-box-sizing: @sizing; 
+	-webkit-box-sizing: @sizing; 
+	box-sizing: @sizing;
+}
+
+.user-select(@type) {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+.border-radius (@topleft,@topright,@bottomright,@bottomleft){
+	border-radius: @topleft @topright @bottomright @bottomleft;
+	-moz-border-radius: @topleft @topright @bottomright @bottomleft;
+	-khtml-border-radius: @topleft @topright @bottomright @bottomleft;
+	-webkit-border-radius: @topleft @topright @bottomright @bottomleft;
+}
+
+.spinner-addon {
+	display: inline-block;
+	position: relative;
+    border: 1px solid gray;
+    width: 100%;
+
+    .border-radius(4px);
+    .box-sizing(border-box);
+    background-color: white;
+    
+    &.disabled{
+        background-color: @grayLighter;
+        opacity: .35;
+        background-image: none;
+    }
+    
+    input {
+        border: none;
+        padding: 0;
+        margin: 2px 2px;
+        vertical-align: middle;
+        .box-sizing(border-box);
+		font-weight: bold;
+		width: 99%;
+    }
+    
+    span {
+    	.box-sizing(border-box);
+    }
+
+	.arrow {
+	   position: absolute;
+	   display: inline-block;
+	   cursor: pointer;
+	   text-align:center;
+	   .user-select(none);
+	   width: 3em;
+	   background-color:@grayLighter;
+	   color: @gray;
+	   font-size: 1em;
+	   
+	   &:hover {
+		   background-color:lighten(@grayLighter,5%);
+	   }
+
+	   span {
+		   height: 100%;
+		   display: inline-block;
+	   }
+	}
+	
+	.up {
+        top: 0;
+        right: 0;
+        height: 50%;
+        border-left: 1px solid @grayLight;
+        border-bottom: 1px solid @grayLight;
+        .border-radius (0, 4px, 0, 0);
+		background: no-repeat url(../images/treeUpTriangleBlack.png) center;
+	}
+	.down {
+	    height: 50%;
+        bottom: 0;
+        right: 0;
+        border-left: 1px solid @grayLight;
+		background: no-repeat url(../images/treeDownTriangleBlack.png) center;
+        .border-radius (0, 0, 4px, 0); 
+	}
+}
+
+
+
