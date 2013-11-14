@@ -14,6 +14,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -67,6 +68,10 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     private RefreshCommand refreshCommand;
 
     private String objectID;
+	private boolean skipIncrease = false;
+	private int lastCursorPos = 0;
+
+	private boolean keyBeingPressed = false;
 
     private class RefreshCommand implements RepeatingCommand {
 
@@ -77,10 +82,14 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
 
             if (cancelled) return false;
 
-            if (increment) {
-                increase();
+            if(skipIncrease) {
+            	skipIncrease = false; 
             } else {
-                decrease();
+	            if (increment) {
+	                increase();
+	            } else {
+	                decrease();
+	            }
             }
 
             if (!timerScheduled) {
@@ -291,6 +300,9 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     private void refreshTextBox() {
         final String format = format();
         textBox.setText(format);
+        if(keyBeingPressed) {
+        	textBox.setCursorPos(lastCursorPos);
+        }
     }
 
     private String format() {
@@ -321,29 +333,49 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     @Override
     @NoExport
     public void onKeyDown(final KeyDownEvent event) {
+    	
+    	lastCursorPos = textBox.getCursorPos();
+    	
         if (enabled && !timerScheduled) {
 
             boolean trigger = false;
             if (event.isDownArrow()) {
+            	stopEvent(event);
                 trigger = true;
                 paged = false;
                 increment = false;
+                keyBeingPressed = true;
             } else if (event.isUpArrow()) {
+            	stopEvent(event);
                 trigger = true;
                 paged = false;
                 increment = true;
+                keyBeingPressed = true;
             } else if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEDOWN) {
+            	stopEvent(event);
                 trigger = true;
                 paged = true;
                 increment = false;
+                keyBeingPressed = true;
             } else if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEUP) {
+            	stopEvent(event);
                 trigger = true;
                 paged = true;
                 increment = true;
+                keyBeingPressed = true;
             }
 
             if (trigger) {
-                timerScheduled = true;
+            	
+            	timerScheduled = true;
+            	skipIncrease  = true;
+            	
+            	if(increment) {
+            		increase();
+            	} else {
+            		decrease();
+            	}
+            	
                 scheduleRefresh(initialDelay);
             }
         }
@@ -359,14 +391,29 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     @Override
     @NoExport
     public void onKeyUp(final KeyUpEvent event) {
+    	
         timerScheduled = false;
+        keyBeingPressed = false;
 
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
             fire();
-        }
+	    } else if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEDOWN) {
+	    	stopEvent(event);
+	    } else if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEUP) {
+	    	stopEvent(event);
+	    } else if (event.isDownArrow()) {
+	    	stopEvent(event);
+	    } else if (event.isUpArrow()) {
+	    	stopEvent(event);
+	    }
     }
 
-    @Override
+    private void stopEvent(KeyCodeEvent<?> event) {
+    	event.stopPropagation();
+    	event.preventDefault();
+	}
+
+	@Override
     @NoExport
     public void onMouseDown(final MouseDownEvent event) {
         if (enabled) {
