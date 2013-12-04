@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.ponysdk.addon'
-    version = '1.0'
+    version = '1.0.1'
 	
 	repositories {
 		flatDir {
@@ -27,11 +27,11 @@ allprojects {
 		}
 	
 		runtime {
-			extendsFrom sl4j, logback, jetty, ponysdk, json
+			extendsFrom sl4j, logback, jetty,ponysdk, json
 		}
 
 		dependencies {
-			ponysdk ':ponysdk:1.11'
+			ponysdk ':ponysdk:0.7.0.2'
 			gwt 'com.google.gwt:gwt-user:2.5.1'
 			gwt 'com.google.gwt:gwt-dev:2.5.1'
 			gwt 'com.google.gwt:gwt-codeserver:2.5.1'

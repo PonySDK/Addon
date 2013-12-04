@@ -18,7 +18,6 @@ import com.ponysdk.ui.server.basic.event.PNativeEvent;
 import com.ponysdk.ui.server.basic.event.PNativeHandler;
 import com.ponysdk.ui.server.basic.event.PValueChangeEvent;
 import com.ponysdk.ui.server.basic.event.PValueChangeHandler;
-import com.ponysdk.ui.server.utils.E;
 
 public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 		PValueChangeHandler<String>, PNativeHandler {
@@ -125,7 +124,7 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 
 	@Override
 	public void setValue(final String value) {
-		if (E.quals(this.value, value))
+		if (Objects.quals(this.value, value))
 			return;
 
 		this.value = value;
