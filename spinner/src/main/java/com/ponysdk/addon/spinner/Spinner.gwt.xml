@@ -10,4 +10,11 @@
 	<entry-point class='com.ponysdk.addon.spinner.client.PTSpinnerFactory' />
 	<source path='client' />
 
+	<!-- 	<add-linker name="xsiframe"/>
+	<collapse-all-properties /> -->
+	
+	<define-linker name="sso" class="com.google.gwt.core.linker.SingleScriptLinker"/>
+	<collapse-all-properties />
+	<add-linker name="sso"/>
+	
 </module>
