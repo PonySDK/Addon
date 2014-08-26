@@ -111,6 +111,10 @@ subprojects {
 	
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
 task launcher() << {
 	File f = new File('build/launcher/AddOnSample.launch')
 	f.mkdirs()
