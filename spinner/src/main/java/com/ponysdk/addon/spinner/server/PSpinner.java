@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 import com.ponysdk.addon.spinner.client.D;
 import com.ponysdk.core.tools.ListenerCollection;
 import com.ponysdk.core.tools.Objects;
+import com.ponysdk.ui.server.addon.DefaultUIAddOn;
 import com.ponysdk.ui.server.basic.HasPValue;
 import com.ponysdk.ui.server.basic.PElement;
 import com.ponysdk.ui.server.basic.event.PHasText;
-import com.ponysdk.ui.server.basic.event.PNativeEvent;
 import com.ponysdk.ui.server.basic.event.PNativeHandler;
 import com.ponysdk.ui.server.basic.event.PValueChangeEvent;
 import com.ponysdk.ui.server.basic.event.PValueChangeHandler;
 
-public class PSpinner extends PElement implements PHasText, HasPValue<String>,
+public class PSpinner extends DefaultUIAddOn implements PHasText, HasPValue<String>,
 		PValueChangeHandler<String>, PNativeHandler {
 
 	private static Logger log = LoggerFactory.getLogger(PSpinner.class);
@@ -40,10 +40,8 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 	private boolean focused;
 
 	public PSpinner(final Options options) {
-		super("span");
-		bindTerminalFunction("spinner");
+		super(new PElement("span"));
 		setOptions(options);
-		addNativeHandler(this);
 	}
 
 	public void setOptions(final Options options) {
@@ -52,30 +50,30 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 
 		if (options.min != null) {
 			min = options.min;
-			update(jso, D.MIN, doubleToString(options.min));
+			updateJSON(jso, D.MIN, doubleToString(options.min));
 		}
 
 		if (options.max != null) {
 			max = options.max;
-			update(jso, D.MAX, doubleToString(max));
+			updateJSON(jso, D.MAX, doubleToString(max));
 		}
 
 		if (options.step != null) {
 			step = options.step;
-			update(jso, D.STEP, doubleToString(options.step));
+			updateJSON(jso, D.STEP, doubleToString(options.step));
 		}
 
 		if (options.page != null) {
 			page = options.page;
-			update(jso, D.PAGE, options.page);
+			updateJSON(jso, D.PAGE, options.page);
 		}
 
 		if (options.decimals != null) {
 			decimals = options.decimals;
-			update(jso, D.DECIMAL, options.decimals);
+			updateJSON(jso, D.DECIMAL, options.decimals);
 		}
 
-		sendToNative(jso);
+		update(jso);
 	}
 
 	protected String doubleToString(final double d) {
@@ -131,7 +129,7 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 		updateAndSend(new JSONObject(), D.TEXT, value);
 	}
 
-	private void update(final JSONObject jso, final String property,
+	private void updateJSON(final JSONObject jso, final String property,
 			final Object v) {
 		try {
 			jso.put(property, v);
@@ -142,8 +140,8 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 
 	private void updateAndSend(final JSONObject jso, final String property,
 			final Object v) {
-		update(jso, property, v);
-		sendToNative(jso);
+		updateJSON(jso, property, v);
+		update(jso);
 	}
 
 	public static class Options {
@@ -278,17 +276,13 @@ public class PSpinner extends PElement implements PHasText, HasPValue<String>,
 	public boolean isFocused() {
 		return focused;
 	}
-
+	
 	@Override
-	public void onNativeEvent(final PNativeEvent event) {
-		try {
-			final JSONObject data = event.getJsonObject();
-			final String value = data.getString("value");
-			final PValueChangeEvent<String> e = new PValueChangeEvent<String>(
-					this, value);
-			onValueChange(e);
-		} catch (final JSONException e) {
-			log.error("Failed to read json object.", e);
-		}
+	protected void restate(JSONObject data) throws JSONException {
+		final String value = data.getString("value");
+		final PValueChangeEvent<String> e = new PValueChangeEvent<String>(
+				this, value);
+		onValueChange(e);
 	}
+
 }

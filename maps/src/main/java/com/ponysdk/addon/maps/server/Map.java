@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ponysdk.core.tools.ListenerCollection;
+import com.ponysdk.ui.server.addon.DefaultUIAddOn;
 import com.ponysdk.ui.server.basic.PHTML;
-import com.ponysdk.ui.server.basic.event.PNativeEvent;
 import com.ponysdk.ui.server.basic.event.PNativeHandler;
 
-public class Map extends PHTML implements PNativeHandler {
+public class Map extends DefaultUIAddOn implements PNativeHandler {
 
     private static Logger log = LoggerFactory.getLogger(Map.class);
 
@@ -27,12 +27,11 @@ public class Map extends PHTML implements PNativeHandler {
     private final ListenerCollection<GeocoderResultHandler> geocoderHandlers = new ListenerCollection<Map.GeocoderResultHandler>();
 
     public Map() {
-        bindTerminalFunction("bindMapAddOn");
-        addNativeHandler(this);
+    	super(new PHTML());
     }
 
     public void find(final String address) {
-        sendToClient("find", address);
+    	sendToClient("find", address);
     }
 
     public void center(final String lat, final String lng) {
@@ -50,7 +49,7 @@ public class Map extends PHTML implements PNativeHandler {
         try {
             final JSONObject jso = new JSONObject();
             jso.put(property, value);
-            sendToNative(jso);
+            update(jso);
         } catch (final JSONException e) {
             log.error("Failed to update json object. " + property + "/" + value, e);
         }
@@ -61,26 +60,22 @@ public class Map extends PHTML implements PNativeHandler {
     }
 
     @Override
-    public void onNativeEvent(final PNativeEvent event) {
-        try {
-            final JSONObject data = event.getJsonObject();
-            if (data.has("geocoder")) {
-                final List<GeocoderResult> geocoderResults = new ArrayList<GeocoderResult>();
-                final JSONArray results = data.getJSONArray("geocoder");
-                for (int i = 0; i < results.length(); i++) {
-                    final JSONObject result = results.getJSONObject(i);
-                    final GeocoderResult r = new GeocoderResult();
-                    r.address = result.getString("address");
-                    r.lat = result.getString("lat");
-                    r.lng = result.getString("lng");
-                    geocoderResults.add(r);
-                }
-                for (final GeocoderResultHandler handler : geocoderHandlers) {
-                    handler.onGeocoderResult(geocoderResults);
-                }
+    protected void restate(JSONObject data) throws JSONException {
+    	if (data.has("geocoder")) {
+            final List<GeocoderResult> geocoderResults = new ArrayList<GeocoderResult>();
+            final JSONArray results = data.getJSONArray("geocoder");
+            for (int i = 0; i < results.length(); i++) {
+                final JSONObject result = results.getJSONObject(i);
+                final GeocoderResult r = new GeocoderResult();
+                r.address = result.getString("address");
+                r.lat = result.getString("lat");
+                r.lng = result.getString("lng");
+                geocoderResults.add(r);
             }
-        } catch (final JSONException e) {
-            log.error("Failed to read json object.", e);
+            for (final GeocoderResultHandler handler : geocoderHandlers) {
+                handler.onGeocoderResult(geocoderResults);
+            }
         }
     }
+    
 }

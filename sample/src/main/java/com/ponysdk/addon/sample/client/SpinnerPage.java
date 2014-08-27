@@ -65,7 +65,7 @@ public class SpinnerPage implements IsPWidget, PValueChangeHandler<String> {
 		addField("Decimals", formatFormField);
 
 		table.setWidget(row++, 0, new PHTML("&nbsp;"));
-		table.setWidget(row++, 0, spinner);
+		table.setWidget(row++, 0, spinner.getWidget());
 		table.getFlexCellFormatter().setColSpan(row - 1, 0, 3);
 
 		flow.add(table);
@@ -79,8 +79,12 @@ public class SpinnerPage implements IsPWidget, PValueChangeHandler<String> {
 
 			@Override
 			public void onClick(final PClickEvent event) {
-				final PSpinner.Options options = buidOptions();
-				spinner.setOptions(options);
+				if(label.equalsIgnoreCase("value")) {
+					spinner.setValue(valueFormField.getValue());
+				} else {
+					final PSpinner.Options options = buidOptions();
+					spinner.setOptions(options);
+				}
 			}
 		});
 		table.setWidget(row, 0, new PLabel(label));

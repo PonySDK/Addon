@@ -6,6 +6,7 @@ allprojects {
 		flatDir {
 	        dirs "$rootDir/lib"
 	    }
+	    jcenter()
 		mavenCentral()
 	    maven {
 	        url "https://github.com/PonySDK/Maven/raw/master/ext"
@@ -31,7 +32,7 @@ allprojects {
 		}
 
 		dependencies {
-			ponysdk ':ponysdk:0.7.0.2'
+			ponysdk 'com.ponysdk:ponysdk:0.7.0.14'
 			gwt 'com.google.gwt:gwt-user:2.5.1'
 			gwt 'com.google.gwt:gwt-dev:2.5.1'
 			gwt 'com.google.gwt:gwt-codeserver:2.5.1'

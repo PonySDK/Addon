@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>Addon Sample</title>
+		<link rel="stylesheet/less" type="text/css" href="style/sample.less" />
+		<script type="text/javascript" src="script/less.js"></script>
+		<script type="text/javascript" src="ponyterminal/ponyterminal.nocache.js"></script>
+		<script type="text/javascript" src="spinner/spinner.nocache.js"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+		<script type="text/javascript" src="script/maps-addon.js" ></script>
+	</head>
+	<body>
+		<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
+		<div id="loading">Loading sample...</div>
+		<script type="text/javascript">
+			var pony = null;
+			function onPonySDKModuleLoaded() {
+				pony = new ponysdk();
+				pony.registerAddOnFactory("com.ponysdk.addon.maps.server.Map", function(params) {
+					return new com.ponysdk.addon.Map(pony, params);
+				});
+				pony.registerAddOnFactory("com.ponysdk.addon.spinner.server.PSpinner", function(params) {
+					var spinner = new com.ponysdk.addon.Spinner();
+					spinner.setObjectID(params.id);
+					spinner.setElement(params.widgetElement);
+					spinner.setPony(pony);
+					spinner.build();
+					return spinner;
+				});
+				pony.start();
+			}
+		</script>
+	</body>
+</html>

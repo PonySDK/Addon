@@ -4,6 +4,7 @@ package com.ponysdk.addon.spinner.client;
 import java.math.BigDecimal;
 
 import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 import org.timepedia.exporter.client.NoExport;
 
@@ -33,7 +34,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.TextBox;
 
-@Export
+@ExportPackage("com.ponysdk.addon")
+@Export("Spinner")
 public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, KeyDownHandler, KeyUpHandler, com.google.gwt.event.logical.shared.ValueChangeHandler<String>, MouseOutHandler, ClickHandler {
 
     private static final String ZEROS = "0000000000000000";
@@ -72,6 +74,10 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
 	private int lastCursorPos = 0;
 
 	private boolean keyBeingPressed = false;
+
+	private JavaScriptObject pony;
+
+	private Element element;
 
     private class RefreshCommand implements RepeatingCommand {
 
@@ -126,15 +132,27 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
     }
 
     public PTSpinner() {}
-
+    
+    public void setPony(JavaScriptObject pony) {
+		this.pony = pony;
+    }
+    
     public void setObjectID(final String objectID) {
         this.objectID = objectID;
     }
 
-    // Export by gwt-exporter
-    public void build(final Element uiObject) {
+    public void setElement(final Element element) {
+    	this.element = element;
+    }
 
-        wrapper = new MyComplexPanel(uiObject);
+    public void onAttach() {
+    	// called when attached
+    }
+    
+    // Export by gwt-exporter
+    public void build() {
+
+        wrapper = new MyComplexPanel(element);
         wrapper.onAttach();
 
         wrapper.add(textBox);
@@ -483,7 +501,7 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         if (value == null) data.put("value", new JSONString(""));
         else data.put("value", new JSONString(value.toString()));
 
-        sendDataToServer(objectID, data.getJavaScriptObject());
+        sendDataToServer(pony, objectID, data.getJavaScriptObject());
     }
 
     private boolean valueChanged() {
@@ -493,8 +511,8 @@ public class PTSpinner implements Exportable, MouseDownHandler, MouseUpHandler, 
         return false;
     }
 
-    private native void sendDataToServer(final String objectID, final JavaScriptObject jsObject) /*-{
-                                                                                                 $wnd.sendDataToServer(objectID, jsObject);
+    private native void sendDataToServer(final JavaScriptObject pony, final String objectID, final JavaScriptObject jsObject) /*-{
+                                                                                                 pony.sendDataToServer(objectID, jsObject);
                                                                                                  }-*/;
 
     private native void log(String msg) /*-{

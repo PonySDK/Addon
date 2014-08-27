@@ -3,9 +3,12 @@ var com = com || {};
 com.ponysdk = com.ponysdk || {};
 com.ponysdk.addon = com.ponysdk.addon || {};
 
-com.ponysdk.addon.Map = function(id, element) {
-	this.id = id;
-	this.element = element;
+com.ponysdk.addon.Map = function(pony, params) {
+
+	this.id = params.id;
+	this.widgetID = params.widgetID;
+	this.widgetElement = params.widgetElement;
+	this.pony = pony;
 
 	this.geocoder = new google.maps.Geocoder();
 
@@ -16,13 +19,12 @@ com.ponysdk.addon.Map = function(id, element) {
 		mapTypeId : google.maps.MapTypeId.ROADMAP
 	}
 
-	this.map = new google.maps.Map(element, mapOptions);
+	this.map = new google.maps.Map(this.widgetElement, mapOptions);
 };
 
-// native object factory
-function bindMapAddOn(id, object) {
-	return new com.ponysdk.addon.Map(id, object);
-}
+// called when widget attached to a parent
+com.ponysdk.addon.Map.prototype.onAttach = function(attached) {
+};
 
 // update method (server to native)
 com.ponysdk.addon.Map.prototype.update = function(data) {
@@ -43,6 +45,6 @@ com.ponysdk.addon.Map.prototype.find = function(address) {
 			var result = results[i];
 			r.push( { 'address': result.formatted_address, 'lat': result.geometry.location.lat(), 'lng': result.geometry.location.lng() } );
 		}
-		sendDataToServer(that.id, {	'geocoder' : r });
+		that.pony.sendDataToServer(that.id, {	'geocoder' : r });
 	});
 };

@@ -16,11 +16,10 @@ import com.ponysdk.ui.server.basic.PWidget;
 import com.ponysdk.ui.server.basic.event.PClickEvent;
 import com.ponysdk.ui.server.basic.event.PClickHandler;
 import com.ponysdk.ui.server.form2.formfield.StringTextBoxFormField;
-import com.ponysdk.ui.terminal.PUnit;
 
 public class MapPage implements IsPWidget, GeocoderResultHandler {
 
-    private final PSplitLayoutPanel split = new PSplitLayoutPanel(PUnit.PX);
+    private final PSplitLayoutPanel split = new PSplitLayoutPanel();
     private final PFlowPanel leftPane = new PFlowPanel();
     private final PSimpleLayoutPanel rightPane = new PSimpleLayoutPanel();
     private final PFlowPanel geocoderResults = new PFlowPanel();
@@ -39,7 +38,7 @@ public class MapPage implements IsPWidget, GeocoderResultHandler {
         split.addWest(leftPane, 250);
         split.add(rightPane);
 
-        rightPane.setWidget(map);
+        rightPane.setWidget(map.getWidget());
 
         address = new StringTextBoxFormField();
         find = new PButton("find");
